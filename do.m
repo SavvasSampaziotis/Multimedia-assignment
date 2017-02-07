@@ -12,6 +12,11 @@ fNameIn = 'LicorDeCalandraca';
 % fNameIn = 'alex_jones_modernstudio.wav';
 fNameOut = [fNameIn,'_SAVVAS_1'];
 
+[AACSeq] = AACoder1(['songs\',fNameIn, '.wav']);
 
-snr = demoAAC1([fNameIn, '.wav'], ['exports\', fNameOut, '.wav'])
+
+i = 120;
+plot([AACSeq(i).chl.frameF, AACSeq(i).chr.frameF]);
+
+%snr = demoAAC1([fNameIn, '.wav'], ['exports\', fNameOut, '.wav'])
 
