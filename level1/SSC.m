@@ -7,7 +7,6 @@ function [ frameType ] = SSC( frameT, nextFrameT, prevFrameType )
 % ìLPSî: „È· LONG_STOP_SEQUENCE
 
 
-%% CASE 3: FRAME IS FIRST FRAME
 % Channel 1
 s1 = SSCsinglechannel(frameT(:,1), nextFrameT(:,1), prevFrameType);
 % Channel 2
@@ -94,23 +93,21 @@ function result = frameIsESH(frame)
 % Filter with HPF
 y = filter([0.7548, -0.7548], [1, -0.5095], frame);
 
+% Energy of each 128 partition
+n = 1:128;
+k=1;
 s2 = zeros(8,1);
-for l=1:8
-    nn = 448 + 128 + (1:128) + (l-1)*128;
-    
-    s2(l) = sum( y(nn).^2 );
-    %          yf = filter([0.7548, -0.7548], [1, -0.5095], frame(nn) );
-    %          s2(l) = sum( yf.^2 );
+for i=576:128:1472
+    s2(k) = sum(y(i+n).^2); % Energy of short segmented signal 
+    k = k+1;
 end
 
 % Calc attack values
-%sigmaSum = sum(s2)/8;
-ds = ones(8,1);
+ds = ones(8,1); % ds(1) = 0 and is not really needed...
 for l=2:8
-    S = sum(s2(1:(l-1)))/l;
+    S = mean(s2(1:(l-1)));
     ds(l) = s2(l)/S;
 end
-
 
 % Check if attack values and short sequence energy qualify for ESH
 result = 0;

@@ -1,22 +1,25 @@
 clear; clc;
+load('G:\Savvas\Documents\AUTH\9o εξάμηνο\Συστήματα Πολυμέσων και Εικονική Πραγματικότητα\Εργασία\Multimedia-assignment\TableB219.mat');
 
-% [AACSeq] = AACoder1('alex_jones_modernstudio.wav');
-% [AACSeq] = AACoder1('LicorDeCalandraca.wav');
-% AACSeq = AACoder1();
-
-% [y, fs] = audioread('alex_jones_modernstudio.wav');
-% [y, fs] = audioread('LicorDeCalandraca.wav');
-% load('level3.mat');
-fNameIn = 'alex_jones_modernstudio';
-fNameIn = 'LicorDeCalandraca';
-% fNameIn = 'alex_jones_modernstudio.wav';
-fNameOut = [fNameIn,'_SAVVAS_1'];
-
-[AACSeq] = AACoder1(['songs\',fNameIn, '.wav']);
+%fName = 'alex_jones_modernstudio';
+fName =  'LicorDeCalandraca';
+fNameIn = ['songs\',fName,'.wav'];
+% fNameOut = ['exports\',fName,'_SAVVAS_1.wav'];
+% 
+% snr = demoAAC1(fNameIn, fNameOut);
+% snr
 
 
+
+[AACSeq] = AACoder1();
 i = 120;
-plot([AACSeq(i).chl.frameF, AACSeq(i).chr.frameF]);
+frameF = AACSeq(i).chl.frameF;
+tns(frameF, 'OLS');
 
-%snr = demoAAC1([fNameIn, '.wav'], ['exports\', fNameOut, '.wav'])
+% clf;
+% hold on;
+% subplot(1,2,1); plot(frameF, 'r'); plot(1./Sw, 'g')
+% subplot(1,2,2); plot(frameFw);
+% hold off;
+% %snr = demoAAC1([fNameIn, '.wav'], ['exports\', fNameOut, '.wav'])
 

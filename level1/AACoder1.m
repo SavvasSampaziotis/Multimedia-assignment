@@ -2,7 +2,7 @@ function [AACSeq1]= AACoder1(fNameIn)
 %AACODER1 Summary of this function goes here
 %   Detailed explanation goes here
 
-winType = 'KBD';
+winType = 'SIN';
 
 
 if nargin==0
@@ -18,8 +18,6 @@ end
 [frames2,~] = linframe(y(:,2), 1024, 2048, 'sym');
 
 [~, numOfFrames] =size(frames1);
-
-
 
 for i=1:numOfFrames
     
@@ -42,7 +40,7 @@ for i=1:numOfFrames
     frameF = filterbank(frameT, frameType, winType);
     
     if strcmp(frameType, 'ESH')
-        % disp([ frameType, num2str(i)]); rR 
+         disp([ frameType, num2str(i)]); 
         chl = struct('frameF',frameF(:,:,1));
         chr = struct('frameF',frameF(:,:,2));
     else
