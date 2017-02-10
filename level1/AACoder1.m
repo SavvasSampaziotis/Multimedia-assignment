@@ -40,7 +40,7 @@ for i=1:numOfFrames
     frameF = filterbank(frameT, frameType, winType);
     
     if strcmp(frameType, 'ESH')
-         disp([ frameType, num2str(i)]); 
+        disp([ frameType, num2str(i)]);
         chl = struct('frameF',frameF(:,:,1));
         chr = struct('frameF',frameF(:,:,2));
     else

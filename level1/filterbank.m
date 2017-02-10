@@ -2,6 +2,10 @@ function frameF = filterbank(frameT, frameType, winType)
 %FILTERBANK
 % This function implements the windowing function and the mdct calculation.
 % frameT = signal with 1 channel per column
+% 
+% ESH: frameF is 128,8,2
+% OLS and other: frameF 1024,2 (Left on 1 and Right on 2, much like the
+% frameT format...
 
 if strcmp(frameType, 'OLS')
     N = 2048;
