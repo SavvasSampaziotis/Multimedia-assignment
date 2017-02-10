@@ -1,8 +1,9 @@
 #################
-## Savvas ingore
+## Savvas ignore
 #################
 
 poop/
-*.wav
-exports/
-songs/
+
+#*.wav
+#exports/
+#songs/
