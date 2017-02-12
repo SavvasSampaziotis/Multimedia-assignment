@@ -9,15 +9,27 @@ if nargin==0
     load('level3.mat');
 else
     [y,~] = audioread(fNameIn);
-    if mod(length(y),2) == 1 % Number of Samples is ODD
-        y = y(1:length(y)-1,:);
-    end
+     if mod(length(y),2) == 1 % Number of Samples is ODD
+         y = y(1:length(y)-1,:);
+     end
 end
 
 [frames1,~] = linframe(y(:,1), 1024, 2048, 'sym');
 [frames2,~] = linframe(y(:,2), 1024, 2048, 'sym');
-
 [~, numOfFrames] =size(frames1);
+
+N = length(y);
+if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence segmentation
+    numOfFrames = ceil(N/1024)+1;
+    nof = N/1024;
+    frem = (numOfFrames- nof)*1024
+    
+    padding = zeros(ceil(frem/2),2);
+    
+    y = [padding;y;padding];
+    size(y)
+end
+return
 
 for i=1:numOfFrames
     

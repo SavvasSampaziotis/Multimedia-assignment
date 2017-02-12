@@ -3,6 +3,7 @@ function [AACSeq2]= AACoder2(fNameIn)
 %   Detailed explanation goes here
 
 winType = 'SIN';
+% winType = 'KBD';
 
 if nargin==0
     load('level3.mat');
@@ -41,7 +42,7 @@ for i=1:numOfFrames
     
     % TNS and channel struct
     if strcmp(frameType, 'ESH')
-        disp([ frameType, num2str(i)]);
+%         disp([ frameType, num2str(i)]);
         frameFout1 = zeros(128,8);
         frameFout2 = zeros(128,8);
         TNSCoeffs1 = zeros(4,8);
