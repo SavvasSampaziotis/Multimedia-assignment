@@ -4,8 +4,6 @@ function x = iAACoder1(AACSeq1, fNameOut, metadata)
 %   
 %   
 %
-%
-%
 N = length(AACSeq1);
 x = zeros((N+1)*1024,2);
 
@@ -36,12 +34,8 @@ n1 = metadata.padding+1;
 n2 = length(x) - metadata.padding;
 x = x(n1:n2,:);
 
-audiowrite(fNameOut, x, 48000);
-
-% there is a zero padding of 1024 samples right on the begging and the end
-% of the signal
-% length(x)
-% x = x(1025:(length(x)-1024),:);
+audiowrite(fNameOut, x, metadata.Fs);
+x(1025:(length(x)-1024),:);
 
 end
 

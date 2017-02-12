@@ -16,7 +16,7 @@ if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence s
     y = [padding; y ;padding];
     numOfFrames = length(y)/1024;
 end
-length(y)
+
 metadata = struct('Fs', Fs, 'padding', padNum);
 
 n = 1:2048;

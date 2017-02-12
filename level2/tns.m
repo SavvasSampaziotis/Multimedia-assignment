@@ -4,7 +4,6 @@ function [ frameFout, TNScoeffs ] = TNS( frameFin, frameType )
 load('TableB219.mat');
 %% MDCT coeff Normalisation
 
-
 if strcmp(frameType, 'ESH')
     % Number of Bands
     NB = 42; % For SHORT_WINDOWS

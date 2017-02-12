@@ -1,4 +1,4 @@
-function x = iAACoder2(AACSeq2, fNameOut)
+function x = iAACoder2(AACSeq2, fNameOut, metadata)
 %IAACODER2 Decodes the signal
 %   x = iAACoder2(AACSeq1, fNameOut, metadata)
 %
@@ -47,7 +47,12 @@ for i=1:N
    
 end
 
-audiowrite(fNameOut, x, 48000);
+% extract the padding
+n1 = metadata.padding+1;
+n2 = length(x) - metadata.padding;
+x = x(n1:n2,:);
+
+audiowrite(fNameOut, x, metadata.Fs);
 
 end
 

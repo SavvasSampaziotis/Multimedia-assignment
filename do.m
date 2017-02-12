@@ -6,7 +6,7 @@ fName = 'alex_jones_modernstudio';
 fNameIn = ['songs\',fName,'.wav'];
 fNameOut = ['exports\',fName,'_SAVVAS_2.wav'];
 %
-[snr] = demoAAC1(fNameIn, fNameOut);
+[snr] = demoAAC2(fNameIn, fNameOut);
 % demoAAC2
 
 % AACSeq = AACoder1(fNameIn)

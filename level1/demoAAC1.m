@@ -24,7 +24,7 @@ end
 % Check if signal got padding...
 e = y-x;
 Px = mean(y.^2);
-Pe = mean(e(1:length(e)-2048,:).^2);
+Pe = mean(e.^2);
 SNR = 10*log10(Px) - 10*log10(Pe)
 
 % plot(e)
