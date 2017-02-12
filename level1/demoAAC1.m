@@ -4,35 +4,28 @@ function SNR = demoAAC1(fNameIn, fNameOut)
 
 disp('Audio Coding has started...');
 tic;
-[AACSeq] = AACoder1(fNameIn);
+[AACSeq,metadata] = AACoder1(fNameIn);
 t = toc;
 disp(['Audio Coding has finished: Coding time = ', num2str(t)]);
 
 disp('Audio Decoding has started...');
 tic;
-x = iAACoder1(AACSeq, fNameOut);
+x = iAACoder1(AACSeq, fNameOut,metadata);
 t = toc;
 disp(['Audio Coding has finished: Decoding time = ', num2str(t)]);
 
 %% SNR Calculation
-
 [y, fs] = audioread(fNameIn);
-
+length(y)
+length(x)
 if mod(length(y),2) == 1 % Number of Samples is ODD
-        y = y(1:length(y)-1,:);
+    y = y(1:length(y)-1,:);
 end
-
 % Check if signal got padding...
-L = length(x) - length(y);
-if L > 0 
-   xP = x((L/2+1):(length(x)-L/2),:);   
-else
-   xP = x; 
-end
-e = y-xP;
+e = y-x;
+Px = mean(y.^2);
+Pe = mean(e(1:length(e)-2048,:).^2);
+SNR = 10*log10(Px) - 10*log10(Pe)
 
-Px = mean(x.^2);
-Pe = mean(e.^2);
-SNR = 10*log10(Px) - 10*log10(Pe);
-
+% plot(e)
 end

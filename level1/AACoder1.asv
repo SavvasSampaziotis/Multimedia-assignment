@@ -4,29 +4,26 @@ function [AACSeq1]= AACoder1(fNameIn)
 
 winType = 'SIN';
 
-
-if nargin==0
-    load('level3.mat');
-else
-    [y,~] = audioread(fNameIn);
-%     if mod(length(y),2) == 1 % Number of Samples is ODD
-%         y = y(1:length(y)-1,:);
-%     end
+[y,~] = audioread(fNameIn);
+if mod(length(y),2) == 1 % Number of Samples is ODD
+    y = y(1:length(y)-1,:);
 end
-
-[frames1,~] = linframe(y(:,1), 1024, 2048, 'sym');
-[frames2,~] = linframe(y(:,2), 1024, 2048, 'sym');
-[~, numOfFrames] =size(frames1);
 
 N = length(y);
 if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence segmentation
     numOfFrames = ceil(N/1024)+1;
-    nof = N/1024;
-    frem = (numOfFrames- nof)*1024;
     
-    zeroPad = [frem/2
+    padNum = 1024 - ceil(mod(N,1024))/2; % a total of Zero pad 1024 samples at the start and at the end of the signal.
+    
+    padding = zeros(ceil(frem/2), 2);
+    
+    y = [padding;y;padding];
+    size(y)
 end
 
+% [frames1,~] = linframe(y(:,1), 1024, 2048, 'sym');
+% [frames2,~] = linframe(y(:,2), 1024, 2048, 'sym');
+% [~, numOfFrames] =size(frames1);
 for i=1:numOfFrames
     
     frameT = [frames1(:,i), frames2(:,i)];

@@ -97,15 +97,16 @@ y = filter([0.7548, -0.7548], [1, -0.5095], frame);
 n = 1:128;
 k=1;
 s2 = zeros(8,1);
-for i=576:128:1472
-    s2(k) = sum(y(i+n).^2); % Energy of short segmented signal 
+for i=1:8;
+    hop = 449 + 128*i;
+    s2(k) = sum( y(n+hop).^2 ); % Energy of short segmented signal 
     k = k+1;
 end
 
 % Calc attack values
 ds = ones(8,1); % ds(1) = 0 and is not really needed...
 for l=2:8
-    S = mean(s2(1:(l-1)));
+    S = mean( s2(1:(l-1)));
     ds(l) = s2(l)/S;
 end
 
@@ -115,8 +116,7 @@ for i=2:8
     if (s2(i) > 10^-3) && (ds(i) > 10)
         %  disp('ESH!!!');
         result = 1;
-        % plot(abs(fft(frame))); hold on; plot(abs(fft(y)),'r'); hold off;
-        break;
+        return;
     end
 end
 end

@@ -1,39 +1,28 @@
-function [AACSeq1]= AACoder1(fNameIn)
+function [AACSeq1, metadata]= AACoder1(fNameIn, metadata)
 %AACODER1 Summary of this function goes here
 %   Detailed explanation goes here
 
 winType = 'SIN';
 
-
-if nargin==0
-    load('level3.mat');
-else
-    [y,~] = audioread(fNameIn);
-     if mod(length(y),2) == 1 % Number of Samples is ODD
-         y = y(1:length(y)-1,:);
-     end
+[y, Fs] = audioread(fNameIn);
+if mod(length(y),2) == 1 % Number of Samples is ODD
+    y = y(1:length(y)-1,:);
 end
-
-[frames1,~] = linframe(y(:,1), 1024, 2048, 'sym');
-[frames2,~] = linframe(y(:,2), 1024, 2048, 'sym');
-[~, numOfFrames] =size(frames1);
 
 N = length(y);
 if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence segmentation
-    numOfFrames = ceil(N/1024)+1;
-    nof = N/1024;
-    frem = (numOfFrames- nof)*1024
-    
-    padding = zeros(ceil(frem/2),2);
-    
-    y = [padding;y;padding];
-    size(y)
+    padNum = 1024 + 1024/2 - ceil(mod(N,1024))/2; % a total of Zero pad 1024 samples at the start and at the end of the signal.
+    padding = zeros(padNum, 2);
+    y = [padding; y ;padding];
+    numOfFrames = length(y)/1024;
 end
-return
+length(y)
+metadata = struct('Fs', Fs, 'padding', padNum);
 
-for i=1:numOfFrames
+n = 1:2048;
+for i=1:(numOfFrames-1)
     
-    frameT = [frames1(:,i), frames2(:,i)];
+    frameT = y(n+(i-1)*1024,:);
     
     if i == 1 % FIRST FRAME
         prevFrameType = 'OLS';
@@ -41,10 +30,10 @@ for i=1:numOfFrames
         prevFrameType = AACSeq1(i-1).frameType;
     end
     
-    if i == numOfFrames % LAST FRAME
+    if i == numOfFrames-1 % Currently proccessing LAST FRAME
         nextFrame = [0,0];
-    else
-        nextFrame =  [frames1(:,i+1),frames2(:,i+1)];
+    else        
+        nextFrame =  y(n + i*1024, :);
     end
     
     frameType = SSC(frameT, nextFrame, prevFrameType);
@@ -52,7 +41,7 @@ for i=1:numOfFrames
     frameF = filterbank(frameT, frameType, winType);
     
     if strcmp(frameType, 'ESH')
-        disp([ frameType, num2str(i)]);
+%         disp([ frameType, num2str(i)]);
         chl = struct('frameF',frameF(:,:,1));
         chr = struct('frameF',frameF(:,:,2));
     else
