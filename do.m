@@ -1,12 +1,12 @@
 clear; clc;
 
 fName = 'alex_jones_modernstudio';
-% fName =  'LicorDeCalandraca';
+fName =  'LicorDeCalandraca';
 
 fNameIn = ['songs\',fName,'.wav'];
 fNameOut = ['exports\',fName,'_SAVVAS_2.wav'];
 %
-[snr] = demoAAC2(fNameIn, fNameOut);
+[snr] = demoAAC3(fNameIn, fNameOut);
 % demoAAC2
 
 % AACSeq = AACoder1(fNameIn)

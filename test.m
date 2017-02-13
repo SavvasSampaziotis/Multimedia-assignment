@@ -1,35 +1,53 @@
-clear
+clear; clc;
 
-[WL,WR] = KBDWindow(2048, 4);
-% [WL,WR] = SineWindow(2048);
+%%
+[y, Fs] = audioread('songs\alex_jones_modernstudio.wav');
+if mod(length(y),2) == 1 % Number of Samples is ODD
+    y = y(1:length(y)-1,:);
+end
+N = length(y);
 
-W =  [WL,WR];
+if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence segmentation
+    padNum = 1024*2  - ceil(mod(N,1024))/2; % a total of Zero pad 1024 samples at the start and at the end of the signal.
+    padding = zeros(padNum, 2);
+    y = [padding; y ;padding];
+    numOfFrames = length(y)/1024;
+end
 
-x = rand(3072,1); %, 1);
+% Emulate the coder and generate some frames and frametypes...
+n = (1:2048) + 0*1024*15;
+frameTprev2 = 0*y(n,:);
+frameTprev1 = 0*y(n+1024,:);
+frameT = y(n+2048,:);
 
-x1 = W'.*x(1:2048);
-x2 = W'.*x(1025:3072);    
-X1 = mdct4(x1);
-X2 = mdct4(x2);
+frameType2 = SSC(frameTprev2, frameTprev1,  'OLS');
+frameType1 = SSC(frameTprev1, frameT,       frameType2);
+frameType  = SSC(frameTprev2, frameTprev1,  frameType1);
+
+% Take only ONE channel...
+frameTprev2 = frameTprev2(:,1);
+frameTprev1 = frameTprev1(:,1);
+
+SMR = psycho(frameT(:,1), frameType, frameTprev1, frameTprev2);
+
+frameF = filterbank(frameT, frameType, 'SIN');
+[frameFout1, TNSCoeffs1] = TNS(frameF(:,1), frameType);
+[frameFout2, TNSCoeffs2] = TNS(frameF(:,2), frameType);
+
+frameF = frameFout1; % For the quantizer...
+%% Quantizer
+
+[ S, sfc, G ] = AACquantizer(frameFout1, frameType, SMR);
+
+
+% alpha = 1;
+% sym symk
+% S = sign(frameF)*
+
+
+% 13 -> This is implemented at the Quantizer...
 
 
 
-x1_ = W'.*imdct4(X1);
-x2_ = W'.*imdct4(X2);
 
-xx = [x1_(1:1024); x1_(1025:2048) + x2_(1:1024); x2_(1025:2048)];
 
-e = x - xx ;
-max(e.^2)
-
-snr = 10 * log10( mean(x(1025:2048).^2) / mean(e(1025:2048).^2))
-
-figure(1)
-clf;
-hold on; 
-%  plot(W); 
-% plot(WW, 'g'); 
-% plot(ix_)
-subplot(2,1,1); plot([X1; flipud(X1)]);
-subplot(2,1,2); plot(W);
-hold off;
