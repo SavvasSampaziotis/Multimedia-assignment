@@ -4,9 +4,9 @@ fName = 'alex_jones_modernstudio';
 fName =  'LicorDeCalandraca';
 
 fNameIn = ['songs\',fName,'.wav'];
-fNameOut = ['exports\',fName,'_SAVVAS_2.wav'];
+fNameOut = ['exports\',fName,'_SAVVAS_3.wav'];
 %
-[snr] = demoAAC3(fNameIn, fNameOut);
+[snr, bitrate, compression] = demoAAC3(fNameIn, fNameOut);
 % demoAAC2
 
 % AACSeq = AACoder1(fNameIn)

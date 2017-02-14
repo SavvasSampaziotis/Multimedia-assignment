@@ -6,21 +6,40 @@ function [ SMR ] = psycho(frameT, frameType, frameTprev1, frameTprev2)
 load('TableSpread.mat');
 load('TableB219.mat');
 
-NT = length(frameT);
-% 2 HANNING and FFT frame is NOT ESH
-frameTw = frameT.*hann(NT);
+if strcmp(frameType, 'ESH')
+    n = 1:256;
+    SMR = zeros(length(B219b),8);
+    SMR(:,1) = psycho2(frameT(n + 448), frameT(n + 448 -128),  frameT(n + 448 -2*128),  B219b, SFb);
+    SMR(:,2) = psycho2(frameT(n + 576), frameT(n + 448),       frameT(n + 448 -128),    B219b, SFb);
+    %     SMR(:,1) = psycho2(frameT(n + 448), frameTprev1(n + 448 + 7*128), frameTprev1(n + 448 + 6*128), B219b, SFb);
+    %     SMR(:,2) = psycho2(frameT(n + 576), frameT(n + 448), frameTprev1(n + 448 + 7*128), B219b, SFb);
+    for k=3:8
+        SMR(:,k) = psycho2(frameT(n +(k-1)*128), frameT(n +(k-2)*128), frameT(n +(k-3)*128), B219b, SFb);
+    end
+else
+    SMR = psycho2(frameT, frameTprev1, frameTprev2, B219a, SFa);
+end
 
+end
+
+function SMR = psycho2(frameT, frameTprev1, frameTprev2, B219, spreadTable)
+
+N = length(frameT);
+NB = length(B219);
+
+% 2 HANNING and FFT frame is NOT ESH
+frameTw = frameT.*hann(N);
 Sw = fft(frameTw);
-r = abs(Sw(1:1024));
-f = angle(Sw(1:1024));
+r = abs(Sw(1:N/2));
+f = angle(Sw(1:N/2));
 
 % 3
-tempw = fft(frameTprev1.*hann(NT));
-r1 = abs(tempw(1:1024));
-f1 = angle(tempw(1:1024));
-tempw = fft(frameTprev2.*hann(NT));
-r2 = abs(tempw(1:1024));
-f2 = angle(tempw(1:1024));
+tempw = fft(frameTprev1.*hann(N));
+r1 = abs(tempw(1:N/2));
+f1 = angle(tempw(1:N/2));
+tempw = fft(frameTprev2.*hann(N));
+r2 = abs(tempw(1:N/2));
+f2 = angle(tempw(1:N/2));
 
 r_pred = 2*r1 - r2;
 f_pred = 2*f1 - f2;
@@ -31,19 +50,18 @@ f_pred = 2*f1 - f2;
 c_w = sqrt( (r.*cos(f) - r_pred.* cos(f_pred)).^2 + (r.*sin(f) - r_pred.*sin(f_pred)).^2 )./(r + abs(r_pred));
 
 % 5 weighted energy
-NB = length(B219a);
+NB = length(B219);
 e_b = zeros(NB,1);
 c_b = e_b;
 for b=1:NB
-    w_low = B219a(b,2)+1;
-    w_high = B219a(b,3)+1;
+    w_low = B219(b,2)+1;
+    w_high = B219(b,3)+1;
     
     e_b(b) = sum( r(w_low:w_high).^2 );
     
     c_b(b) = sum ( c_w(w_low:w_high).*r(w_low:w_high).^2 );
 end
 
-spreadTable = SFa;
 ecb = zeros(NB,1);
 ct = zeros(NB,1);
 % 6 spreading function compined with predictability
@@ -77,7 +95,7 @@ nb = en.*bc;
 npart = zeros(NB,1);
 q_thr_hat = npart;
 for b=1:NB
-    q_thr_hat(b) = eps*NT/2*10^((B219a(b,6)/10));
+    q_thr_hat(b) = eps*N/2*10^((B219(b,6)/10));
     npart(b) = max(nb(b), q_thr_hat(b));
 end
 
@@ -85,8 +103,5 @@ end
 
 % 12
 SMR = e_b./npart;
-
-
-
 end
 

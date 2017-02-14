@@ -15,9 +15,9 @@ if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence s
 end
 
 % Emulate the coder and generate some frames and frametypes...
-n = (1:2048) + 0*1024*15;
-frameTprev2 = 0*y(n,:);
-frameTprev1 = 0*y(n+1024,:);
+n = (1:2048) + 1024*15;
+frameTprev2 = y(n,:);
+frameTprev1 = y(n+1024,:);
 frameT = y(n+2048,:);
 
 frameType2 = SSC(frameTprev2, frameTprev1,  'OLS');
@@ -34,20 +34,16 @@ frameF = filterbank(frameT, frameType, 'SIN');
 [frameFout1, TNSCoeffs1] = TNS(frameF(:,1), frameType);
 [frameFout2, TNSCoeffs2] = TNS(frameF(:,2), frameType);
 
-frameF = frameFout1; % For the quantizer...
+% frameF = frameFout1; % For the quantizer...
+frameT = frameT(:,1);
 %% Quantizer
 
 [ S, sfc, G ] = AACquantizer(frameFout1, frameType, SMR);
+err = imdct4(frameF(:,1)) - imdct4(S);  
 
+max(abs(err))
 
-% alpha = 1;
-% sym symk
-% S = sign(frameF)*
-
-
-% 13 -> This is implemented at the Quantizer...
-
-
-
-
+Pe = 10*log10(mean(err.^2))
+Px = 10*log10(mean(imdct4(S).^2))
+SNR = Px/Pe
 
