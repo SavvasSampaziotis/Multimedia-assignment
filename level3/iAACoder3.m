@@ -9,7 +9,7 @@ x = zeros((N+1)*1024,2);
 for i=1:N
     prog = floor(i*100/N);
     if ismember(prog, [25,50,75,90])
-        disp(['Coder has completed ', num2str(prog),'% of the signal']);
+        disp(['DeCoder has completed ', num2str(prog),'% of the signal']);
     end
     
     frameType = AACSeq3(i).frameType;
@@ -69,6 +69,9 @@ end
 n1 = metadata.padding+1;
 n2 = length(x) - metadata.padding;
 x = x(n1:n2,:);
+if metadata.extra == 1
+   x = x(1:length(x)-1,:); 
+end
 
 audiowrite(fNameOut, x, metadata.Fs);
 

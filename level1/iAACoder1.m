@@ -34,6 +34,10 @@ n1 = metadata.padding+1;
 n2 = length(x) - metadata.padding;
 x = x(n1:n2,:);
 
+if metadata.extra == 1
+   x = x(1:length(x)-1,:); 
+end
+
 audiowrite(fNameOut, x, metadata.Fs);
 x(1025:(length(x)-1024),:);
 

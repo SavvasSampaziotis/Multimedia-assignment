@@ -1,6 +1,7 @@
 function S = quant(X, a, B219)
-%QUANT Summary of this function goes here
-%   Detailed explanation goes here
+%QUANT This is the quantizer of the AACoder. 
+% Parameter 'a' is the scale factor gain. 
+
 S = zeros(size(X));
 for b = 1:length(B219)
     w_low = B219(b,2)+1;

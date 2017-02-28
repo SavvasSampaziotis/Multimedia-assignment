@@ -1,6 +1,5 @@
 function [ frameType ] = SSC( frameT, nextFrameT, prevFrameType )
-%% SSC: This functions accepts requires both channels of audio to realise the
-% segmentation
+%% SSC: This functions accepts requires both channels of audio to realise the segmentation.
 % ìOLSî: „È· ONLY_LONG_SEQUENCE
 % ìLSSî: „È· LONG_START_SEQUENCE
 % ìESHî: „È· EIGHT_SHORT_SEQUENCE
@@ -23,7 +22,7 @@ FinalTypeMap = {
 frameType = FinalTypeMap(S2index(s1),S2index(s2));
 end
 
-%
+%%
 %
 %
 %
@@ -40,8 +39,6 @@ if strcmp(prevFrameType, 'NONE')
     prevFrameType = 'OLS';
     
 end
-
-%%
 
 switch S2index(prevFrameType)
     case S2index('OLS')
@@ -99,7 +96,7 @@ k=1;
 s2 = zeros(8,1);
 for i=1:8;
     hop = 449 + 128*i;
-    s2(k) = sum( y(n+hop).^2 ); % Energy of short segmented signal 
+    s2(k) = sum( y(n+hop).^2 ); % Energy of short segmented signal
     k = k+1;
 end
 

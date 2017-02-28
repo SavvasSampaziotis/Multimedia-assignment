@@ -1,6 +1,6 @@
 function X_ = iQuant(S, a, B219)
-%IQUANT Summary of this function goes here
-%   Detailed explanation goes here
+%IQUANT This is the inverse quantizer of the AACoder. 
+%Parameter 'a' is the scale factor gain. 
 
 X_ = zeros(size(S));
 for b = 1:length(B219)

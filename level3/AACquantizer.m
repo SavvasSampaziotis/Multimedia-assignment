@@ -41,75 +41,91 @@ end
 alpha_hat = floor(16/3*log2( (max(frameF)^(3/4))/8191));
 % alpha_hat = -60;
 a = alpha_hat*ones(NB,1);
-
 a = optimizeSFC(frameF, a, T, B219);
 
-sfc = diff(a); 
-% DPCM -> sfc's are pure signed integers! so there is no fear of 
-% quantization errors in the coding proccess...
+sfc = diff(a);
+% DPCM -> sfc's are pure signed integers! so there is no fear of
+% quantization errors in the DPCM proccess...
 G = a(1);
 S = quant(frameF, a, B219);
-end
 
-function Pe = quantError(X, a, B219)
-Pe = zeros(length(B219),1);
-X_ = iQuant(quant(X,a, B219), a, B219);
-for b = 1:length(B219)
-    w_low = B219(b,2)+1;
-    w_high = B219(b,3)+1;
-    Pe(b) = sum( (X(w_low:w_high)- X_(w_low:w_high)).^2);
-end
-if any(isnan(Pe))
-    disp(['FUCK']);
-    %     X_
-end
-end
-
-function sfc = optimizeSFC(frameF, a, T, B219)
-flag = 1;
-NB = length(B219);
-aFLAG = ones(NB,1);
-while flag
-    Pe = quantError(frameF, a, B219);
-    
-    flag = sum(aFLAG) > 0;
-    % Exit flag. If all sfc's are markedas done, then the quantizer has
-    % done all ti can...
-    
-%     if max(diff(a)) >= 60 % TODO: investigateif it needs removal
-%         break;
+%% Ploting the Pe and Acoustic Threshold of a random frame
+% if (rand(1) > 0.8 )
+%     NB = length(B219);
+%     Pe = zeros(NB,1);
+%     for b=1:NB
+%        Pe(b) = quantError2(frameF, a(b), b, B219); 
 %     end
-    for b=2:(NB-1)
-        if aFLAG(b) == 1  % a(b) has room for improvement
-            if (Pe(b) < T(b)) && (abs(a(b+1)-a(b)) < 60) && (abs(a(b-1)-a(b)) < 60)
-                a(b) = a(b) + 1;
-            else
-%                 a(b) = a(b) - 1; % So that we that just barely Pe < T(b).
-                aFLAG(b) = 0;  % a(b) is done: no more increasing                
-            end
-        end
-    end
-    b = NB;
-    if aFLAG(b) == 1  % a(b) has room for improvement
-        if Pe(b) < T(b) && (abs(a(b-1)-a(b)) < 60)
+%     plot(1:NB,10*log([Pe,T])) ;
+%     title('Acoustic Threshold and quantization error');
+%     xlabel('band index b')
+%     ylabel('dB')
+%     legend('Pe','T','Location', 'Best')
+%     
+%     % IMPORTANT: The plot of the T-Pe, was made with a BREAKING POINT.
+%     % Otherwise the execution will go to butt...
+%     disp('Heeehaaaw');
+% end
+end
+
+function Pe = quantError2(X, a, b, B219)
+% This function returns the Power of the Quantization Error, JUST for the
+% band of index b. The input parameter a is JUST ONE scale factor gain, not
+% the whole vector...
+w_low = B219(b,2)+1;
+w_high = B219(b,3)+1;
+w = (w_low:w_high);
+
+aa = 2^(-a/4);
+S = sign(X(w)).* round( power(abs(X(w))*aa, 3/4) + 0.4054); % has a length of w
+aa = 2^(a/4);
+X_ = sign(S).*power(abs(S),4/3)*aa; % has a length of w
+
+Pe = sum((X(w) - X_).^2);
+
+end
+
+%%
+function sfc = optimizeSFC(frameF, a, T, B219)
+
+NB = length(B219);
+for b=1:NB
+    while 1
+        Pe = quantError2(frameF, a(b), b, B219);
+        if Pe < T(b)
             a(b) = a(b) + 1;
         else
-%             a(b) = a(b) - 1; % So that we that just barely Pe < T(b).
-            aFLAG(b) = 0;  % a(b) is done 
+            a(b) = a(b) - 1; % We reduce the sfc gain just that Pe < T
+            %The optimizer has done all it can. The quantization step cannot be
+            %increased any further
+            break;
         end
     end
-    b = 1;
-    if aFLAG(b) == 1  % a(b) has room for improvement
-        if Pe(b) < T(b) && (abs(a(b+1)-a(b)) < 60)
-            a(b) = a(b) + 1;
-        else
-%             a(b) = a(b) - 1; % So that we that just barely Pe < T(b).
-            aFLAG(b) = 0;  % a(b) is done 
+end
+% the sfc gains are now OPTIMAL, when it comes to Pe and the Acoustic
+% Threshold. However we need to reduce the |a(b+1) - a(b)| for the DPCM
+% efficiency. For this, we can ONLY reduce the each a(b), so that the Pe
+% condition is met.
+flag = 1;
+while flag
+    flag = 0;
+    for b=1:(NB-1)
+        if a(b+1) - a(b) > 60
+            a(b+1) = a(b+1) - 1;
+            flag = 1;
+        elseif a(b+1) - a(b) < -60
+            a(b) = a(b) - 1;
+            flag = 1;
         end
     end
 end
 
-sfc= a;
+
+[Max, iMax] = max(abs(diff(a)));
+if Max > 60
+    disp(['done SFC optimization. Max = ', num2str(Max), ' b = ' num2str(iMax)])
+end
+sfc = a;
 end
 
 

@@ -1,10 +1,12 @@
 function [ x ] = spreadingfun( i, j, B219 )
-%SPREADINGFUN Summary of this function goes here
-%   Detailed explanation goes here
+%SPREADINGFUN This is the spreading function generated fot the
+%psychoacoustics stage of the coder. It's purpose is to generate the whole
+%matrix, instead of calling it multiple times during the execution of the
+%coder
 
 % NOTE: It has been noticed in the B219 tables that for i < j then bval(i)
 % < bval(j). As a result, it doesn't matter if the indeces or the bark
-% values are compared
+% values are compared, instead of the actual bands
 
 % if B219(i,5) >= B219(j,5)
 if i >= j

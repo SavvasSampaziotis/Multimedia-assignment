@@ -79,8 +79,7 @@ for i=1:length(mag)
         % any problems, so the filter is ok with marginally stable poles for now.
     else
         % System is stable. No worries.
-    end
-    
+    end 
 end
 
 end

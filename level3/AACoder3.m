@@ -2,11 +2,15 @@ function [AACSeq3, metadata]= AACoder3(fNameIn)
 %AACODER1 Summary of this function goes here
 %   Detailed explanation goes here
 
+winType = 'SIN';
 winType = 'KBD';
 
 [y, Fs] = audioread(fNameIn);
+extra = 0;
 if mod(length(y),2) == 1 % Number of Samples is ODD
-    y = y(1:length(y)-1,:);
+%     y = y(1:length(y)-1,:);
+    y = [y; [0,0]];
+    extra = 1;
 end
 
 N = length(y);
@@ -17,7 +21,7 @@ if mod(N,1024) ~= 0 % Signal needs additional zero padding for proper sequence s
     numOfFrames = length(y)/1024;
 end
 
-metadata = struct('Fs', Fs, 'padding', padNum);
+metadata = struct('Fs', Fs, 'padding', padNum, 'extra', extra);
 
 n = 1:2048;
 frameTprev1 =zeros(2048, 2);
@@ -51,7 +55,7 @@ for i=1:(numOfFrames-1)
     
     % TNS and channel struct
     if frameIsESH
-                 disp([ frameType, num2str(i)]);
+%       disp([ frameType, num2str(i)]);
         frameFout1 = zeros(128,8);
         frameFout2 = zeros(128,8);
         TNSCoeffs1 = zeros(4,8);
