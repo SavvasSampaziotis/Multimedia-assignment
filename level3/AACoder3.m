@@ -3,7 +3,7 @@ function [AACSeq3, metadata]= AACoder3(fNameIn)
 %   Detailed explanation goes here
 
 winType = 'SIN';
-winType = 'KBD';
+% winType = 'KBD';
 
 [y, Fs] = audioread(fNameIn);
 extra = 0;

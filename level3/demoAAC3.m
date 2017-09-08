@@ -39,7 +39,7 @@ disp(['Compression Ratio: ', num2str(compressedSize/originalSize*100),' % (x ', 
 disp(['Channel 1 SNR: ', num2str(SNR(1)), ' dB']);
 disp(['Channel 2 SNR: ', num2str(SNR(2)), ' dB']);
 %%
-% save('AACSeq3.mat');
+save('AACSeq3.mat');
 end
 
 
